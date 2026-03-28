@@ -1,0 +1,54 @@
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+@Component({
+  selector: 'app-user-list',
+  template: `
+    <h2>User List</h2>
+    <div *ngIf="isLoading">Loading users...</div>
+    <ul *ngIf="!isLoading && users.length > 0">
+       
+      <li>{{ user.name }} ({{ user.email }})</li>
+    </ul>
+    <p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>
+    <p *ngIf="!isLoading && users.length === 0 && !errorMessage">No users found.</p>
+  `,
+  styles: [`
+    ul { list-style-type: none; padding: 0; }
+    li { margin-bottom: 10px; border: 1px solid #ccc; padding: 10px; }
+  `]
+})
+export class UserListComponent implements OnInit {
+  users: User[] = [];
+  errorMessage: string | null = null;
+  isLoading: boolean = true;
+
+
+  constructor(private http: HttpClient) { }
+
+  ngOnInit(): void {
+    this.fetchUsers();
+  }
+
+  fetchUsers(): void {
+    this.http.get<User[]>('https://jsonplaceholder.typicode.com/users').pipe(
+      catchError(() => {
+        this.errorMessage = 'Failed to load users';
+        return of([]);
+      }),
+      finalize(() => {
+        this.isLoading = false;
+      })
+    ).subscribe((data: User[]) => {
+      this.users = data;
+    });
+  }
+}
