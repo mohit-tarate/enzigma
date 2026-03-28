@@ -1,4 +1,4 @@
- 
+
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -15,7 +15,7 @@ interface User {
   template: `
     <h2>User List</h2>
       <p *ngIf="isLoading">Loading users...</p>
-      <ul *ngIf="!isloading && users.length > 0 ">
+      <ul *ngIf="!isLoading && users.length > 0 ">
         <li *ngFor="let user of users">
         {{ user.name }} ({{ user.email }})
         </li>
